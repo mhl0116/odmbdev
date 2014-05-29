@@ -56,23 +56,23 @@ namespace emu { namespace odmbdev {
 
     class HardReset : public Action {
     public:
-      HardReset(emu::pc::Crate * crate) : Action(crate) {}
-	void display(xgi::Output * out) { addButton(out, "Hard reset (crate)", "width: 230px "); }
-	void respond(xgi::Input * in, std::ostringstream & out);
+    HardReset(emu::pc::Crate * crate) : Action(crate) {}
+      void display(xgi::Output * out) { addButton(out, "Hard reset (crate)", "width: 230px "); }
+      void respond(xgi::Input * in, std::ostringstream & out);
     };
     
     class L1Reset : public Action {
     public:
-      L1Reset(emu::pc::Crate * crate) : Action(crate) {}
-	void display(xgi::Output * out) { addButton(out, "L1 Reset (Resync)", "width: 100%; "); }
-	void respond(xgi::Input * in, std::ostringstream & out);
+    L1Reset(emu::pc::Crate * crate) : Action(crate) {}
+      void display(xgi::Output * out) { addButton(out, "L1 Reset (Resync)", "width: 100%; "); }
+      void respond(xgi::Input * in, std::ostringstream & out);
     };
 
     class BC0 : public Action {
     public:
-      BC0(emu::pc::Crate * crate) : Action(crate) {}
-	void display(xgi::Output * out) { addButton(out, "BC0", "width: 250px; "); }
-	void respond(xgi::Input * in, std::ostringstream & out);
+    BC0(emu::pc::Crate * crate) : Action(crate) {}
+      void display(xgi::Output * out) { addButton(out, "BC0", "width: 250px; "); }
+      void respond(xgi::Input * in, std::ostringstream & out);
     };
 
 
@@ -405,7 +405,7 @@ namespace emu { namespace odmbdev {
     public:
       PCPRBSTest(Crate* crate, emu::odmbdev::Manager* manager);
       void respond(xgi::Input* in, ostringstream& out,
-		   const string& textBoxContent_in);
+                   const string& textBoxContent_in);
     };
 
     //Performs PRBS test of DDU TX on a V3 ODMB using a V2 ODMB in slot 19
@@ -413,7 +413,7 @@ namespace emu { namespace odmbdev {
     public:
       DDUPRBSTest(Crate* crate, emu::odmbdev::Manager* manager);
       void respond(xgi::Input* in, ostringstream& out,
-		   const string& textBoxContent_in);
+                   const string& textBoxContent_in);
     };
     
     /**************************************************************************
@@ -471,7 +471,7 @@ namespace emu { namespace odmbdev {
       LVMBtest_dos(Crate * crate, emu::odmbdev::Manager* manager);
       void respond(xgi::Input * in, ostringstream & out, const string& textBoxContent_in);
     };
-   
+
     /**************************************************************************
      * DCFEBPulses
      *
@@ -574,6 +574,19 @@ namespace emu { namespace odmbdev {
     };
 
     /**************************************************************************
+     * LCTL1AScn
+     *
+     * A class to scan across LCT L1A delays
+     **************************************************************************/
+    class LCTL1AScan: public ThreeTextBoxAction{
+    public:
+      LCTL1AScan(Crate* crate, emu::odmbdev::Manager* manager);
+      void respond(xgi::Input* in, ostringstream& out, const string& textBoxContent_in);
+      uint_fast16_t GetBestDelay(const unsigned slot, const unsigned device, const uint_fast16_t lower_delay,
+				 const uint_fast16_t upper_delay, const double run_time);
+    };
+
+    /**************************************************************************
      * Log Buttons
      *
      * These are special actions that modify the log
@@ -581,35 +594,35 @@ namespace emu { namespace odmbdev {
 
     class ClearLog : public LogAction {
     public:
-      ClearLog(emu::pc::Crate * crate) : LogAction(crate) { }
-	void display(xgi::Output * out) { addButton(out, "Clear Log"); }
-	void respond(xgi::Input * in, xgi::Output * out, std::ostringstream & ssout, std::ostringstream & log) {
-	  log.clear(); // remove any error flags
-	  log.str(""); // empty the log
-	}
+    ClearLog(emu::pc::Crate * crate) : LogAction(crate) { }
+      void display(xgi::Output * out) { addButton(out, "Clear Log"); }
+      void respond(xgi::Input * in, xgi::Output * out, std::ostringstream & ssout, std::ostringstream & log) {
+        log.clear(); // remove any error flags
+        log.str(""); // empty the log
+      }
     };
 
     class SaveLogAsFile : public LogAction {
     public:
-      SaveLogAsFile(emu::pc::Crate * crate) : LogAction(crate) { }
-	void display(xgi::Output * out) { addButton(out, "Save Log as..."); }
-	void respond(xgi::Input * in, xgi::Output * out, std::ostringstream & ssout, std::ostringstream & log) {
-	  std::string file_name = "odmbdev_" + emu::utils::getDateTime(true) + ".log";
-	  emu::utils::saveAsFileDialog(out, log.str(), file_name);
-	  ssout.str("*** Contents above was saved to a log file ***");
-	}
+    SaveLogAsFile(emu::pc::Crate * crate) : LogAction(crate) { }
+      void display(xgi::Output * out) { addButton(out, "Save Log as..."); }
+      void respond(xgi::Input * in, xgi::Output * out, std::ostringstream & ssout, std::ostringstream & log) {
+        std::string file_name = "odmbdev_" + emu::utils::getDateTime(true) + ".log";
+        emu::utils::saveAsFileDialog(out, log.str(), file_name);
+        ssout.str("*** Contents above was saved to a log file ***");
+      }
     };
 
     class DumpLog : public LogAction {
     public:
-      DumpLog(emu::pc::Crate * crate) : LogAction(crate) { }
-	void display(xgi::Output * out) { addButton(out, "Dump Log to stdout"); }
-	void respond(xgi::Input * in, xgi::Output * out, std::ostringstream & ssout, std::ostringstream & log) {
-	  std::cout<<"----- "<<emu::utils::getDateTime(false)<<": Log Dump -----"<<std::endl<<std::endl;
-	  std::cout<<log.str()<<std::endl;
-	  std::cout<<"----- End of Log Dump -----"<<std::endl;
-	  ssout.str("*** Contents above was dumped to stdout ***");
-	}
+    DumpLog(emu::pc::Crate * crate) : LogAction(crate) { }
+      void display(xgi::Output * out) { addButton(out, "Dump Log to stdout"); }
+      void respond(xgi::Input * in, xgi::Output * out, std::ostringstream & ssout, std::ostringstream & log) {
+        std::cout<<"----- "<<emu::utils::getDateTime(false)<<": Log Dump -----"<<std::endl<<std::endl;
+        std::cout<<log.str()<<std::endl;
+        std::cout<<"----- End of Log Dump -----"<<std::endl;
+        ssout.str("*** Contents above was dumped to stdout ***");
+      }
     };
 
 

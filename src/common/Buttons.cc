@@ -937,8 +937,8 @@ namespace emu {
      *************************************************************************/
 
     L1aDelayScan::L1aDelayScan(Crate * crate, emu::odmbdev::Manager* manager)
-      : Action( crate, manager ),
-        Action2Values<int, int>(100, 140) {}
+    : Action( crate, manager ),
+            Action2Values<int, int>(100, 140) {}
 
     void L1aDelayScan::display(xgi::Output * out)
     {
@@ -1573,8 +1573,8 @@ namespace emu {
      *************************************************************************/
 
     DDU_FakeL1::DDU_FakeL1(Crate * crate)
-      : Action(crate),
-        ActionValue<string>("read") {}
+    : Action(crate),
+                                     ActionValue<string>("read") {}
     
     void DDU_FakeL1::display(xgi::Output * out)
     {
@@ -2113,8 +2113,8 @@ namespace emu {
             iss >> pipeDepth;
             out << "SET_PIPE   " << pipeDepth << endl;
           } else if (buffer=="BURN_IN_TEST") { 
-	    out << vme_wrapper_->BurnInODMBs().c_str() << endl;
-	  } else { // Anything else is treated as a comment.
+            out << vme_wrapper_->BurnInODMBs().c_str() << endl;
+          } else { // Anything else is treated as a comment.
             out  << line << endl;
             logfile << "# " << line << endl;
             continue; // Next line, please.
@@ -2295,17 +2295,17 @@ namespace emu {
     void SYSMON::respond(xgi::Input * in, ostringstream & out) { // TD
       out << "********** System Monitoring **********" << endl;
             
-int slot = Manager::getSlotNumber();
+      int slot = Manager::getSlotNumber();
       /*unsigned int odmb_id = vme_wrapper_->VMERead(0x4100, slot, "Checking ODMB version");
-      unsigned int odmb_version = odmb_id >> 12u;
-      unsigned int read_addr_vec[9] = {0x7150, 0x7120, 0x7000, 0x7160, 0x7140, 0x7100, 0x7130, 0x7110, 0x7170};
-      string description[9] = {"C\t -  Thermistor 1 temperature", odmb_version<=3?"C\t -  Thermistor 2 temperature":"mA\t -  IPPIB: Current for PPIB", "C\t -  FPGA temperature", 
-                               "V\t -  P1V0: Voltage for FPGA", "V\t -  P2V5: Voltage for FPGA", "V\t -  LV_P3V3: Voltage for FPGA", 
-                               "V\t -  P3V6_PP: Voltage for PPIB", "V\t -  P5V: General voltage", "V\t -  P5V_LVMB: Voltage for LVMB"};
-      //int precision[9] = {1, 1, 1, 2, 2, 2, 2, 2, 2};
-      float voltmax[9] = {1.0, 1.0, 1.0, 1.0, 2.5, 3.3, 3.6, 5.0, 5.0};
-      float result2[9];
-      for (int i = 0; i < 9; i++){
+        unsigned int odmb_version = odmb_id >> 12u;
+        unsigned int read_addr_vec[9] = {0x7150, 0x7120, 0x7000, 0x7160, 0x7140, 0x7100, 0x7130, 0x7110, 0x7170};
+        string description[9] = {"C\t -  Thermistor 1 temperature", odmb_version<=3?"C\t -  Thermistor 2 temperature":"mA\t -  IPPIB: Current for PPIB", "C\t -  FPGA temperature", 
+        "V\t -  P1V0: Voltage for FPGA", "V\t -  P2V5: Voltage for FPGA", "V\t -  LV_P3V3: Voltage for FPGA", 
+        "V\t -  P3V6_PP: Voltage for PPIB", "V\t -  P5V: General voltage", "V\t -  P5V_LVMB: Voltage for LVMB"};
+        //int precision[9] = {1, 1, 1, 2, 2, 2, 2, 2, 2};
+        float voltmax[9] = {1.0, 1.0, 1.0, 1.0, 2.5, 3.3, 3.6, 5.0, 5.0};
+        float result2[9];
+        for (int i = 0; i < 9; i++){
         // old version...
         // crate_->vmeController()->vme_controller(2,read_addr,&data,rcv);
         //unsigned short int VMEresult = (rcv[1] & 0xff) * 0x100 + (rcv[0] & 0xff);
@@ -2315,24 +2315,24 @@ int slot = Manager::getSlotNumber();
         unsigned short int VMEresult = vme_wrapper_->VMERead(read_addr_vec[i],slot,description[i]);
         VMEresult = vme_wrapper_->VMERead(read_addr_vec[i],slot,description[i]);
         if (i == 0 && VMEresult > 0xfff){
-          cout << "ERROR: bad readout from system monitoring." << endl; out << "ERROR: bad readout from system monitoring." << endl;
-          break;
+        cout << "ERROR: bad readout from system monitoring." << endl; out << "ERROR: bad readout from system monitoring." << endl;
+        break;
         }
         if (i == 2){
-          result2[i] = 503.975*VMEresult/4096.0 - 273.15;
+        result2[i] = 503.975*VMEresult/4096.0 - 273.15;
         }else if (i > 1){
-          result2[i] = VMEresult*2.0*voltmax[i]/4096.0;
+        result2[i] = VMEresult*2.0*voltmax[i]/4096.0;
         }else if (i == 0 || i == 1){
-          if(i==1 && odmb_version>=4){
-            result2[i] = VMEresult *5000.0/4096.0-10.0;
-          }else{
-            result2[i] = ((7.865766417e-10 * VMEresult - 7.327237418e-6) * VMEresult + 3.38189673e-2) * VMEresult - 9.678340882;
-          }
+        if(i==1 && odmb_version>=4){
+        result2[i] = VMEresult *5000.0/4096.0-10.0;
+        }else{
+        result2[i] = ((7.865766417e-10 * VMEresult - 7.327237418e-6) * VMEresult + 3.38189673e-2) * VMEresult - 9.678340882;
+        }
         }
 
         //out << "R  " << FixLength(read_addr & 0xffff) << "        " << description[i] << ": " << setprecision(precision[i]) << result2[i] << endl;      
         out << fix_width(result2[i], 4) << " " << description[i]<< endl;
-      }
+        }
       */
       string s_sysmon=vme_wrapper_->SYSMONReport(slot);
       out << s_sysmon;
@@ -2638,7 +2638,7 @@ int slot = Manager::getSlotNumber();
     }
 
     LVMB904::LVMB904(Crate * crate, emu::odmbdev::Manager* manager) 
-      : RepeatTextBoxAction(crate, manager, "LVMB 904",300) 
+    : RepeatTextBoxAction(crate, manager, "LVMB 904",300) 
     { 
       //This constructor intentionally left blank.
     }
@@ -3059,6 +3059,116 @@ int slot = Manager::getSlotNumber();
       UpdateLog(vme_wrapper_, slot, out_local);
     }
 
+    LCTL1AScan::LCTL1AScan(Crate* crate, emu::odmbdev::Manager* manager):
+    ThreeTextBoxAction(crate, manager, "LCT L1A Scan","0 0x3f","0x1ff", "100", "Range","Mask","Time",
+                       "width: 128px;", "width: 64px;", "width: 64px;", "width: 32px;"){
+    }
+
+    void LCTL1AScan::respond(xgi::Input* in, std::ostringstream& out,
+                             const std::string& textBoxContent_in){
+      ThreeTextBoxAction::respond(in, out, textBoxContent_in);
+      double run_time(strtod(textBoxContent3.c_str(), NULL));
+      if(run_time<0.0) run_time=0.0;
+      const unsigned slot(Manager::getSlotNumber());
+      string hdr("********** LCT L1A Scan ***********");
+      JustifyHdr(hdr);
+      out << hdr << std::endl;
+      
+      char* end_pointer;
+      const unsigned lower_delay(strtoul(textBoxContent.c_str(), &end_pointer, 0));
+      const unsigned upper_delay(strtoul(end_pointer, NULL, 0));
+      const uint_fast16_t mask(strtoul(textBoxContent2.c_str(), NULL, 0));
+      
+      const unsigned num_devices(9);
+      for(unsigned device(1); device<=num_devices; ++device){
+        if(mask & (1 << (device-1))){//Mask bit for this device is 1
+          const uint_fast16_t best_delay(GetBestDelay(slot, device, lower_delay, upper_delay, run_time));
+          out << "Device " << device << " best delay: " << best_delay << '\n';
+          std::cout << "Device " << device << " best delay: " << best_delay << '\n';
+        }
+      }
+    }
+
+    uint_fast16_t LCTL1AScan::GetBestDelay(const unsigned slot, const unsigned device, const uint_fast16_t lower_delay,
+                                           const uint_fast16_t upper_delay, const double run_time){
+      uint_fast16_t best_delay(lower_delay);
+      if(lower_delay<upper_delay){
+	const unsigned num_delay_bits(6);//Delays are read/written with only 6 bits
+        const uint_fast16_t device_or(device << 4);
+        const uint_fast16_t read_num_l1a_match_addr(0x320C | device_or);
+        const uint_fast16_t read_num_lct_addr(0x370C | device_or);
+        uint_fast16_t delay_addr(0x4000);
+        switch(device){
+        case 8: delay_addr=0x4004; break;
+        case 9: delay_addr=0x400C; break;
+        default: break;
+        }
+        const uint_fast16_t init_delay(vme_wrapper_->VMERead(delay_addr, slot, "Read initial delay."));
+
+        std::cout << setfill(' ') << "Device " << device << ":\nDelay: L1A Match Fraction\n";
+      
+        double max_fraction(0.0);
+
+	const double single_time(run_time/(upper_delay-lower_delay+1ul));
+	time_t start_time(0), now(0);
+	time(&start_time);
+	now=start_time;
+        for(uint_fast16_t delay(lower_delay);
+            delay<=upper_delay && delay<(1ul << num_delay_bits);
+            ++delay){
+          vme_wrapper_->VMEWrite(delay_addr, delay, slot, "Set LCT L1A delay.");
+          uint_fast16_t last_num_lct(vme_wrapper_->VMERead(read_num_lct_addr,
+                                                           slot,
+                                                           "Read initial number of LCTs."));
+          uint_fast16_t last_num_l1a_match(vme_wrapper_->VMERead(read_num_l1a_match_addr,
+                                                                 slot,
+                                                                 "Read initial number of L1A matches."));
+          
+          //Subtract starting counts and later keep track of counter overflows
+          int_fast32_t num_l1a_match_offset(-last_num_l1a_match);
+          int_fast32_t num_lct_offset(-last_num_lct);
+        
+          uint_fast32_t num_lcts(0);
+          uint_fast32_t num_l1a_matches(0);
+        
+	  while(difftime(now, start_time)<=((delay-lower_delay+1u)*single_time)){
+            const unsigned counter_bits(16);
+            const uint_fast16_t this_num_lct(vme_wrapper_->VMERead(read_num_lct_addr,
+                                                                   slot,
+                                                                   "Read number of LCTs."));
+            const uint_fast16_t this_num_l1a_match(vme_wrapper_->VMERead(read_num_l1a_match_addr,
+                                                                         slot,
+                                                                         "Read number of L1A matches."));
+            
+            //Check for overflow
+            if(this_num_lct<last_num_lct) num_lct_offset+=(1ul << counter_bits);
+            if(this_num_l1a_match<last_num_l1a_match) num_l1a_match_offset+=(1ul << counter_bits);
+            
+            //Update counts
+            num_l1a_matches=this_num_l1a_match+num_l1a_match_offset;
+            num_lcts=this_num_lct+num_lct_offset;
+            
+            last_num_l1a_match=this_num_l1a_match;
+            last_num_lct=this_num_lct;
+
+            time(&now);
+          }
+
+          const double match_fraction(num_lcts?(static_cast<double>(num_l1a_matches)/num_lcts):0.0);
+          if(match_fraction>max_fraction){
+            max_fraction=match_fraction;
+            best_delay=delay;
+          }
+          std::cout << setw(5) << delay << ": "
+                    << setw(3) << num_l1a_matches << '/'
+                    << setw(3) << num_lcts << '='
+                    << fix_width(match_fraction, 10) << '\n';
+        }//End delay loop
+        vme_wrapper_->VMEWrite(delay_addr, init_delay, slot, "Restore initial delay.");
+      }
+      return best_delay;
+    }
+    
     LVMBtest_dos::LVMBtest_dos(Crate* crate, emu::odmbdev::Manager* manager):
       RepeatTextBoxAction(crate, manager, "LVMB histogram",100){ 
       //This constructor intentionally left blank.

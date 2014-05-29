@@ -91,12 +91,12 @@ namespace emu { namespace odmbdev {
       xmlparser.parseFile(xmlConfig_.toString());
 
       if (!xmlparser.GetEmuEndcap()) 
-      {
-        // if something went wrong while parsing ...
-        XCEPT_RAISE(xcept::Exception,
-            string("Could not parse xml crate configuration file, ") +
-            xmlConfig_.toString() + ".");
-      }
+        {
+          // if something went wrong while parsing ...
+          XCEPT_RAISE(xcept::Exception,
+                      string("Could not parse xml crate configuration file, ") +
+                      xmlConfig_.toString() + ".");
+        }
 
       Crate * crate = xmlparser.GetEmuEndcap()->crates().at(USE_CRATE_N); // we could make this a member variable and not need to pass it around everywhere
 
@@ -166,7 +166,7 @@ namespace emu { namespace odmbdev {
       addActionByTypename<HardReset>(crate);
       addActionByTypename<ReprogramDCFEB>(crate);
       addActionByTypename<LVMBtest_dos>(crate, this);
-      
+      addActionByTypename<LCTL1AScan>(crate, this);
       // putButtonsInGroup( "Routine Tests" );
       // addActionByTypename<RoutineTest_ShortCosmicsRun>(crate, this);
       // addActionByTypename<RoutineTest_PrecisionPulses>(crate, this);
@@ -252,108 +252,108 @@ namespace emu { namespace odmbdev {
            << head()
            << style().set("rel", "stylesheet").set("type", "text/css")
            << "" // you could add page-wide styles here
-	   << endl
+           << endl
            << style()
            << script().set("type", "text/javascript")
-           // I appologize to the programming gods for writing JavaScript as
-           // a string inside a C++ program ... (NB gcc will concatenate
-           // adjacent string literals)
+        // I appologize to the programming gods for writing JavaScript as
+        // a string inside a C++ program ... (NB gcc will concatenate
+        // adjacent string literals)
            << "function toggleSidebox() {" << endl <<
-              "  var elements = document.getElementsByClassName('sidebox');" << endl <<
-              "  Array.prototype.slice.call(elements, 0).map("
-              "    function (e) { "
-              "      e.style.display = e.style.display == 'none' ? 'block' "
-              "                                                  : 'none'" 
-              "    })"
-              "}"
+        "  var elements = document.getElementsByClassName('sidebox');" << endl <<
+        "  Array.prototype.slice.call(elements, 0).map("
+        "    function (e) { "
+        "      e.style.display = e.style.display == 'none' ? 'block' "
+        "                                                  : 'none'" 
+        "    })"
+        "}"
            << script()
            << head()
            << endl
            << body().set("style","padding-bottom: 10em; color: #333; ")
            << endl
-           // << cgicc::div().set("style","font-size: xx-small")
-           // << a().set("href","/") << "<< back to XDAQ" << a()
-           // << cgicc::div()
-	   << endl
+        // << cgicc::div().set("style","font-size: xx-small")
+        // << a().set("href","/") << "<< back to XDAQ" << a()
+        // << cgicc::div()
+           << endl
            << cgicc::div().set("style","width: 515px;float: left")
            << endl 
            << endl
-	//<< h1()
+        //<< h1()
            << "<h1><FONT COLOR=\"FF0000\"> O</FONT><FONT COLOR=\"0000FF\">DMB</FONT> Test Routines - UCSB </h1>"
-	//<< h1()
+        //<< h1()
            << endl << endl;
 
-	std::string GoToProductionTests = toolbox::toString("/%s/ProductionTests",getApplicationDescriptor()->getURN().c_str());
-  	*out << cgicc::a("[Production Tests]").set("href",GoToProductionTests) << std::endl;
+      std::string GoToProductionTests = toolbox::toString("/%s/ProductionTests",getApplicationDescriptor()->getURN().c_str());
+      *out << cgicc::a("[Production Tests]").set("href",GoToProductionTests) << std::endl;
 
       // most actions will appear here
       for(uint g=0; g<groups_.size(); ++g) {
-	if (g>0) continue;
-	t_actionvector av=groupActions_[groups_[g]];
-	for(unsigned int i = 0; i <av.size(); ++i) {
-	  //cout<<"i "<<i<<", g "<<g<<endl;
+        if (g>0) continue;
+        t_actionvector av=groupActions_[groups_[g]];
+        for(unsigned int i = 0; i <av.size(); ++i) {
+          //cout<<"i "<<i<<", g "<<g<<endl;
 
-	  // this multi-line statement sets up a form for the action,
-	  // which will create buttons, etc. The __action_to_call hidden
-	  // form element tells the Manager which action to use when
-	  // this form is submitted.
+          // this multi-line statement sets up a form for the action,
+          // which will create buttons, etc. The __action_to_call hidden
+          // form element tells the Manager which action to use when
+          // this form is submitted.
 
-	  if(i==2) *out<<"<div style=\"width:255px; float:left;\">"<<endl;
-	  if(((av.size()-3)/2)==(i-2) && i%2==1)
-	    *out<<"</div>"<<endl<<"<div style=\"width:255px; float:left;\">"<<endl;
-	  *out <<p()<< cgicc::form()
-	    .set("method","GET")
-	    .set("action", "groupActions")
-	       << cgicc::input()
-	    .set("type","hidden")
-	    .set("value",numberToString(i*groups_.size()+g))
-	    .set("name","__action_to_call")
-	       << endl;
+          if(i==2) *out<<"<div style=\"width:255px; float:left;\">"<<endl;
+          if(((av.size()-3)/2)==(i-2) && i%2==1)
+            *out<<"</div>"<<endl<<"<div style=\"width:255px; float:left;\">"<<endl;
+          *out <<p()<< cgicc::form()
+            .set("method","GET")
+            .set("action", "groupActions")
+               << cgicc::input()
+            .set("type","hidden")
+            .set("value",numberToString(i*groups_.size()+g))
+            .set("name","__action_to_call")
+               << endl;
 
-	  av[i]->display(out);
+          av[i]->display(out);
 
-	  // and here we close the form
-	  *out << cgicc::form()<<p() << endl;
-	  if(i==av.size()-2) *out<<"</div>"<<endl;
-	}
+          // and here we close the form
+          *out << cgicc::form()<<p() << endl;
+          if(i==av.size()-2) *out<<"</div>"<<endl;
+        }
       }
 
       *out << cgicc::div() << endl << endl;
 
-//////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////
+      //////////////////////////////////////////////////////////////
+      //////////////////////////////////////////////////////////////
 
       // // begin: floating right hand side box
       // *out << cgicc::div()
-      // 	.set("style",
-      // 	     string("position:fixed;") +
-      // 	     "float:right;" +
-      // 	     "border: #000 solid 1px;" +
-      // 	     "top: 1em;" +
-      // 	     "right: 1em;" +
-      // 	     "padding: 1em;" +
-      // 	     "background-color: #eee")
-      // 	   << endl
-      // 	// the minimize button
+      //        .set("style",
+      //             string("position:fixed;") +
+      //             "float:right;" +
+      //             "border: #000 solid 1px;" +
+      //             "top: 1em;" +
+      //             "right: 1em;" +
+      //             "padding: 1em;" +
+      //             "background-color: #eee")
+      //           << endl
+      //        // the minimize button
       //      << cgicc::a()
-      // 	.set("onclick", "toggleSidebox();")
-      // 	.set("accesskey", "m")
-      // 	.set("style",
-      // 	     string("position:absolute;") +
-      // 	     "float:right;" +
-      // 	     "border: #000 solid 1px;" +
-      // 	     "top: 0.5em;" +
-      // 	     "right: 0.5em;" +
-      // 	     "background-color: #222;" +
-      // 	     "color: #eee;" +
-      // 	     "font-weight: bold;" +
-      // 	     "text-decoration: none;")
+      //        .set("onclick", "toggleSidebox();")
+      //        .set("accesskey", "m")
+      //        .set("style",
+      //             string("position:absolute;") +
+      //             "float:right;" +
+      //             "border: #000 solid 1px;" +
+      //             "top: 0.5em;" +
+      //             "right: 0.5em;" +
+      //             "background-color: #222;" +
+      //             "color: #eee;" +
+      //             "font-weight: bold;" +
+      //             "text-decoration: none;")
       //      << "&mdash;"
       //      << cgicc::a()
-      // 	   << endl
+      //           << endl
       //      << h3().set("class", "sidebox") 
-      // 	   << "Common Utilities" 
-      // 	   << h3() << endl;
+      //           << "Common Utilities" 
+      //           << h3() << endl;
 
       // // this is only for common actions which we always want visible
       // for(unsigned int i = 0; i < commonActions_.size(); ++i) {
@@ -363,13 +363,13 @@ namespace emu { namespace odmbdev {
       //   // this form is submitted.
       //   *out << p()
       //        << cgicc::form()
-      // 	  .set("class", "sidebox")
-      // 	  .set("method","GET")
-      // 	  .set("action", "commonActions")
+      //          .set("class", "sidebox")
+      //          .set("method","GET")
+      //          .set("action", "commonActions")
       //        << cgicc::input()
-      // 	  .set("type","hidden")
-      // 	  .set("value",numberToString(i))
-      // 	  .set("name","__action_to_call")
+      //          .set("type","hidden")
+      //          .set("value",numberToString(i))
+      //          .set("name","__action_to_call")
       //        << endl;
 
       //   commonActions_[i]->display(out);
@@ -388,24 +388,24 @@ namespace emu { namespace odmbdev {
 
       for(unsigned int i = 1; i < logActions_.size(); ++i) { // display log buttons at the top
         *out << p()
-	     << cgicc::form().set("method","GET")
-	  .set("action", "logActions")
-	     << "Output log " 
+             << cgicc::form().set("method","GET")
+          .set("action", "logActions")
+             << "Output log " 
              << cgicc::input().set("type","hidden")
-	  .set("value",numberToString(i))
-	  .set("name","__action_to_call");
+          .set("value",numberToString(i))
+          .set("name","__action_to_call");
 
-	logActions_[i]->display(out);
+        logActions_[i]->display(out);
 
-	*out << cgicc::form()
-	     << p();
+        *out << cgicc::form()
+             << p();
       }
 
       *out << textarea().set("style",
                              string("width: 100%; ")
                              + "height: 870px; ")
-           // NB, I purposely called .str(), I don't want to remove all the
-           // contents of the log into the web page, I want them to persist
+        // NB, I purposely called .str(), I don't want to remove all the
+        // contents of the log into the web page, I want them to persist
            << this->webOutputLog_.str()
            << textarea();
 
@@ -414,83 +414,83 @@ namespace emu { namespace odmbdev {
 
     }
 
-	// Generate production tests page (JB-F)
+    // Generate production tests page (JB-F)
     void Manager::ProductionTests(xgi::Input *in, xgi::Output *out) {
-  	    	         	  
-  	  *out << HTMLDoctype(HTMLDoctype::eStrict)
+                                  
+      *out << HTMLDoctype(HTMLDoctype::eStrict)
            << endl
            << endl
            << html().set("lang", "en").set("dir","ltr")
            << head()
            << style().set("rel", "stylesheet").set("type", "text/css")
            << "" // you could add page-wide styles here
-	   << endl
+           << endl
            << style()
            << script().set("type", "text/javascript")
            << "function toggleSidebox() {" << endl <<
-              "  var elements = document.getElementsByClassName('sidebox');" << endl <<
-              "  Array.prototype.slice.call(elements, 0).map("
-              "    function (e) { "
-              "      e.style.display = e.style.display == 'none' ? 'block' "
-              "                                                  : 'none'" 
-              "    })"
-              "}"
+        "  var elements = document.getElementsByClassName('sidebox');" << endl <<
+        "  Array.prototype.slice.call(elements, 0).map("
+        "    function (e) { "
+        "      e.style.display = e.style.display == 'none' ? 'block' "
+        "                                                  : 'none'" 
+        "    })"
+        "}"
            << script()
            << head()
            << endl
            << body().set("style","padding-bottom: 10em; color: #333; ")
            << endl
-	   << endl
+           << endl
            << cgicc::div().set("style","width: 515px;float: left")
            << endl 
            << endl
-	//<< h1()
+        //<< h1()
            << "<h1><FONT COLOR=\"FF0000\"> O</FONT><FONT COLOR=\"0000FF\">DMB</FONT> Production Tests</h1>"
-	//<< h1()
+        //<< h1()
            << endl << endl;
           
-        std::string GoToMainPage = toolbox::toString("/%s/",getApplicationDescriptor()->getURN().c_str());
-  	    *out << cgicc::a("[Main Page]").set("href",GoToMainPage) << std::endl;
-	// This is just for the create log button
-	*out << p()
-	     << cgicc::form().set("method","GET")
-	  .set("action", "logActions")
-	     << "Output log " 
-             << cgicc::input().set("type","hidden")
-	  .set("value",numberToString(0))
-	  .set("name","__action_to_call");
+      std::string GoToMainPage = toolbox::toString("/%s/",getApplicationDescriptor()->getURN().c_str());
+      *out << cgicc::a("[Main Page]").set("href",GoToMainPage) << std::endl;
+      // This is just for the create log button
+      *out << p()
+           << cgicc::form().set("method","GET")
+        .set("action", "logActions")
+           << "Output log " 
+           << cgicc::input().set("type","hidden")
+        .set("value",numberToString(0))
+        .set("name","__action_to_call");
 
-	logActions_[0]->display(out);
+      logActions_[0]->display(out);
 
-	*out << cgicc::form()
-	     << p();
-	     
-	for(uint g=1; g<groups_.size(); ++g) { // all groups except for the routine tests on the main page
-	  t_actionvector av=groupActions_[groups_[g]];
-	  
-	  for(unsigned int i = 0; i <av.size(); ++i) {
-	  // this multi-line statement sets up a form for the action,
-	  // which will create buttons, etc. The __action_to_call hidden
-	  // form element tells the Manager which action to use when
-	  // this form is submitted.
-	  *out << p()
-	       << cgicc::form()
-	    .set("method","GET")
-	    .set("action", "groupActionsSD")
-	       << cgicc::input()
-	    .set("type","hidden")
-	    .set("value",numberToString(i*groups_.size()+g))
-	    .set("name","__action_to_call")
-	       << endl;
+      *out << cgicc::form()
+           << p();
+             
+      for(uint g=1; g<groups_.size(); ++g) { // all groups except for the routine tests on the main page
+        t_actionvector av=groupActions_[groups_[g]];
+          
+        for(unsigned int i = 0; i <av.size(); ++i) {
+          // this multi-line statement sets up a form for the action,
+          // which will create buttons, etc. The __action_to_call hidden
+          // form element tells the Manager which action to use when
+          // this form is submitted.
+          *out << p()
+               << cgicc::form()
+            .set("method","GET")
+            .set("action", "groupActionsSD")
+               << cgicc::input()
+            .set("type","hidden")
+            .set("value",numberToString(i*groups_.size()+g))
+            .set("name","__action_to_call")
+               << endl;
 
-	  av[i]->display(out);
+          av[i]->display(out);
 
-	  // and here we close the form
-	  *out << cgicc::form()
-	       << p()
-	       << endl;
-	  }
-	}
+          // and here we close the form
+          *out << cgicc::form()
+               << p()
+               << endl;
+        }
+      }
 
       *out << cgicc::div() << endl << endl;
 
@@ -498,24 +498,24 @@ namespace emu { namespace odmbdev {
 
       for(unsigned int i = 1; i < logActions_.size(); ++i) { // display log buttons at the top
         *out << p()
-	     << cgicc::form().set("method","GET")
-	  .set("action", "logActions")
-	     << "Output log " 
+             << cgicc::form().set("method","GET")
+          .set("action", "logActions")
+             << "Output log " 
              << cgicc::input().set("type","hidden")
-	  .set("value",numberToString(i))
-	  .set("name","__action_to_call");
+          .set("value",numberToString(i))
+          .set("name","__action_to_call");
 
-	logActions_[i]->display(out);
+        logActions_[i]->display(out);
 
-	*out << cgicc::form()
-	     << p();
+        *out << cgicc::form()
+             << p();
       }
 
       *out << textarea().set("style",
                              string("width: 100%; ")
                              + "height: 870px; ")
-           // NB, I purposely called .str(), I don't want to remove all the
-           // contents of the log into the web page, I want them to persist
+        // NB, I purposely called .str(), I don't want to remove all the
+        // contents of the log into the web page, I want them to persist
            << this->webOutputLog_.str()
            << textarea();
                  
@@ -661,12 +661,12 @@ namespace emu { namespace odmbdev {
            << html()
            << endl;
       /*if (subDir) {
-      	*out << HTMLDoctype(HTMLDoctype::eStrict)
-           << endl
-           << html().set
-      }
-      std::string GoToProductionTests = toolbox::toString("/%s/ProductionTests",getApplicationDescriptor()->getURN().c_str());
-  	  *out << cgicc::a("[Production Tests]").set("href",GoToProductionTests) << std::endl;*/
+       *out << HTMLDoctype(HTMLDoctype::eStrict)
+       << endl
+       << html().set
+       }
+       std::string GoToProductionTests = toolbox::toString("/%s/ProductionTests",getApplicationDescriptor()->getURN().c_str());
+       *out << cgicc::a("[Production Tests]").set("href",GoToProductionTests) << std::endl;*/
     }
 
 
@@ -699,10 +699,10 @@ namespace emu { namespace odmbdev {
       xdata::Integer64 maxNumberOfEvents  = -1; // unlimited if negative
       xdata::Boolean   writeBadEventsOnly = false;
       m.setParameters( "emu::daq::manager::Application", 
-		       emu::soap::Parameters()
-		       .add( "runType"           , &runType            )
-		       .add( "maxNumberOfEvents" , &maxNumberOfEvents  )
-		       .add( "writeBadEventsOnly", &writeBadEventsOnly ) );
+                       emu::soap::Parameters()
+                       .add( "runType"           , &runType            )
+                       .add( "maxNumberOfEvents" , &maxNumberOfEvents  )
+                       .add( "writeBadEventsOnly", &writeBadEventsOnly ) );
       m.sendCommand( "emu::daq::manager::Application", "Configure" );      
       waitForDAQToExecute( "Configure", 10 );
       //
@@ -711,13 +711,13 @@ namespace emu { namespace odmbdev {
       m.sendCommand( "emu::daq::manager::Application", "Enable" );
       waitForDAQToExecute( "Enable", 10 );
 
-//       xdata::Integer64 tmp;
-//       m.getParameters( "emu::daq::manager::Application", 0, emu::soap::Parameters().add( "maxNumberOfEvents", &tmp ) );
-//       cout<<" emu::daq::manager::Application ==> maxNumberOfEvents = "<<tmp.toString()<<endl;
-//       cout<<" emu::daq::manager::Application ==> maxNumberOfEvents = "<<tmp.toString()<<endl;
-//       cout<<" emu::daq::manager::Application ==> maxNumberOfEvents = "<<tmp.toString()<<endl;
-//       cout<<" emu::daq::manager::Application ==> maxNumberOfEvents = "<<tmp.toString()<<endl;
-//       cout<<" emu::daq::manager::Application ==> maxNumberOfEvents = "<<tmp.toString()<<endl;
+      //       xdata::Integer64 tmp;
+      //       m.getParameters( "emu::daq::manager::Application", 0, emu::soap::Parameters().add( "maxNumberOfEvents", &tmp ) );
+      //       cout<<" emu::daq::manager::Application ==> maxNumberOfEvents = "<<tmp.toString()<<endl;
+      //       cout<<" emu::daq::manager::Application ==> maxNumberOfEvents = "<<tmp.toString()<<endl;
+      //       cout<<" emu::daq::manager::Application ==> maxNumberOfEvents = "<<tmp.toString()<<endl;
+      //       cout<<" emu::daq::manager::Application ==> maxNumberOfEvents = "<<tmp.toString()<<endl;
+      //       cout<<" emu::daq::manager::Application ==> maxNumberOfEvents = "<<tmp.toString()<<endl;
     }
 
     void Manager::stopDAQ(){
@@ -737,20 +737,20 @@ namespace emu { namespace odmbdev {
       emu::soap::Messenger m( this );
       xdata::String  daqState;
       for ( uint64_t i=0; i<=seconds; ++i ){
-	m.getParameters( "emu::daq::manager::Application", 0, emu::soap::Parameters().add( "daqState", &daqState ) );
-	if ( daqState.toString() != "Halted"  && daqState.toString() != "Ready" && 
-	     daqState.toString() != "Enabled" && daqState.toString() != "INDEFINITE" ){
-	  LOG4CPLUS_ERROR( logger_, "Local DAQ is in " << daqState.toString() << " state. Please destroy and recreate local DAQ." );
-	  return false;
-	}
-	if ( daqState.toString() == expectedState ){ return true; }
-	LOG4CPLUS_INFO( logger_, "Waited " << i << " sec so far for local DAQ to get " 
-			<< expectedState << ". It is still in " << daqState.toString() << " state." );
-	::sleep( 1 );
+        m.getParameters( "emu::daq::manager::Application", 0, emu::soap::Parameters().add( "daqState", &daqState ) );
+        if ( daqState.toString() != "Halted"  && daqState.toString() != "Ready" && 
+             daqState.toString() != "Enabled" && daqState.toString() != "INDEFINITE" ){
+          LOG4CPLUS_ERROR( logger_, "Local DAQ is in " << daqState.toString() << " state. Please destroy and recreate local DAQ." );
+          return false;
+        }
+        if ( daqState.toString() == expectedState ){ return true; }
+        LOG4CPLUS_INFO( logger_, "Waited " << i << " sec so far for local DAQ to get " 
+                        << expectedState << ". It is still in " << daqState.toString() << " state." );
+        ::sleep( 1 );
       }
       
       LOG4CPLUS_ERROR( logger_, "Timeout after waiting " << seconds << " sec for local DAQ to get " << expectedState 
-		       << ". It is in " << daqState.toString() << " state." );
+                       << ". It is in " << daqState.toString() << " state." );
       return false;
     }
 
