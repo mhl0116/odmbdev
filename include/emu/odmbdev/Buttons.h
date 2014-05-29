@@ -428,6 +428,28 @@ namespace emu { namespace odmbdev {
     };
 
     /**************************************************************************
+     * LVMB904
+     *
+     * Building 904 version of test -- voltages and ranges hard-coded
+     **************************************************************************/
+    class LVMB904 : public RepeatTextBoxAction {
+    public:
+      LVMB904(Crate * crate, emu::odmbdev::Manager* manager);
+      void respond(xgi::Input * in, ostringstream & out, const string& textBoxContent_in);
+    };
+
+    /**************************************************************************
+     * BurnInTest
+     *
+     * Print unique ID and firmware info -- also do SYSMON                                                                                                                          
+     **************************************************************************/
+    class BurnInTest : public ButtonAction {
+    public:
+      BurnInTest(Crate * crate);                                                                                                                                                 
+      void respond(xgi::Input * in, ostringstream & out);
+    };           
+
+    /**************************************************************************
      * ReadODMBVitals
      *
      * Print unique ID and firmware info
@@ -472,6 +494,17 @@ namespace emu { namespace odmbdev {
       void respond(xgi::Input * in, ostringstream & out, const string& textBoxContent_in);
     };     
     
+    // Testing for yellowpage button (Jack/Frank)
+    class STEP9bFibers_old : public RepeatTextBoxAction {
+    public:
+      STEP9bFibers_old(Crate * crate, emu::odmbdev::Manager* manager);
+      void respond(xgi::Input * in, ostringstream & out, const string& textBoxContent_in);
+    }; 
+    class STEP9bFibers : public RepeatTextBoxAction {
+    public:
+      STEP9bFibers(Crate * crate, emu::odmbdev::Manager* manager);
+      void respond(xgi::Input * in, ostringstream & out, const string& textBoxContent_in);
+    }; 
     /**************************************************************************
      * DCFEBFiber
      *
