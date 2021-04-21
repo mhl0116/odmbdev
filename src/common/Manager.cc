@@ -304,7 +304,7 @@ namespace emu { namespace odmbdev {
 	    *out<<"</div>"<<endl<<"<div style=\"width:255px; float:left;\">"<<endl;
 	  *out <<p()<< cgicc::form()
 	    .set("method","GET")
-	    .set("action", "groupActions")
+	    .set("/" + getApplicationDescriptor()->getURN() + "/" + "action", "groupActions")
 	       << cgicc::input()
 	    .set("type","hidden")
 	    .set("value",numberToString(i*groups_.size()+g))
@@ -390,7 +390,7 @@ namespace emu { namespace odmbdev {
       for(unsigned int i = 1; i < logActions_.size(); ++i) { // display log buttons at the top
         *out << p()
 	     << cgicc::form().set("method","GET")
-	  .set("action", "logActions")
+	  .set("/" + getApplicationDescriptor()->getURN() + "/" +"action", "logActions")
 	     << "Output log " 
              << cgicc::input().set("type","hidden")
 	  .set("value",numberToString(i))
@@ -455,7 +455,7 @@ namespace emu { namespace odmbdev {
 	// This is just for the create log button
 	*out << p()
 	     << cgicc::form().set("method","GET")
-	  .set("action", "logActions")
+	  .set("/" + getApplicationDescriptor()->getURN() + "/" +"action", "logActions")
 	     << "Output log " 
              << cgicc::input().set("type","hidden")
 	  .set("value",numberToString(0))
@@ -477,7 +477,7 @@ namespace emu { namespace odmbdev {
 	  *out << p()
 	       << cgicc::form()
 	    .set("method","GET")
-	    .set("action", "groupActionsSD")
+	    .set("/" + getApplicationDescriptor()->getURN() + "/" +"action", "groupActionsSD")
 	       << cgicc::input()
 	    .set("type","hidden")
 	    .set("value",numberToString(i*groups_.size()+g))
@@ -500,7 +500,7 @@ namespace emu { namespace odmbdev {
       for(unsigned int i = 1; i < logActions_.size(); ++i) { // display log buttons at the top
         *out << p()
 	     << cgicc::form().set("method","GET")
-	  .set("action", "logActions")
+	  .set("/" + getApplicationDescriptor()->getURN() + "/" +"action", "logActions")
 	     << "Output log " 
              << cgicc::input().set("type","hidden")
 	  .set("value",numberToString(i))
